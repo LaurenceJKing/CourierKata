@@ -120,19 +120,50 @@ namespace Shipping.Tests
             }
         }
 
-        [Fact]
-        public void The_total_cost_is_the_sum_of_the_shipping_costs_of_each_parcel()
+        public class Without_speedy_shipping: ShippingCostCalculatorTests
         {
-            var parcels = new[]
+
+            [Fact]
+            public void The_total_cost_is_the_sum_of_the_shipping_costs_of_each_parcel()
             {
+                var parcels = new[]
+                {
                 new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 1.0 }, //small parcel: $3
                 new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 10.0 }, //medium parcel:$8
                 new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 50.0 }, //large pacel: $15
                 new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 100.0 } //XL parcel: $25
             };
 
-            var shippingCostBreakdown = SUT.CalculateShippingCosts(parcels);
-            shippingCostBreakdown.TotalCostInDollars.Should().Be(51.00m);
+                var shippingCostBreakdown = SUT
+                    .WithShippingSpeed(ShippingSpeed.Normal)
+                    .CalculateShippingCosts(parcels);
+
+                shippingCostBreakdown.SpeedyShippingCostInDollars.Should().Be(0.00m);
+                shippingCostBreakdown.TotalCostInDollars.Should().Be(51.00m);
+            }
+        }
+
+        public class WithSpeedyShipping: ShippingCostCalculatorTests
+        {
+            [Fact]
+            public void The_total_cost_is_twice_the_sum_of_the_shipping_costs_of_each_parcel()
+            {
+                var parcels = new[]
+                {
+                new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 1.0 }, //small parcel: $3
+                new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 10.0 }, //medium parcel:$8
+                new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 50.0 }, //large pacel: $15
+                new Parcel{ WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 100.0 } //XL parcel: $25
+            };
+
+                var shippingCostBreakdown = SUT
+                    .WithShippingSpeed(ShippingSpeed.Speedy)
+                    .CalculateShippingCosts(parcels);
+
+                shippingCostBreakdown.SpeedyShippingCostInDollars.Should().Be(51.00m);
+                shippingCostBreakdown.TotalCostInDollars.Should().Be(102.00m);
+            }
+
         }
     }
 

@@ -5,6 +5,11 @@ namespace Shipping
     public class ShippingCostBreakdown
     {
         public ParcelSize[] Parcels { get; internal init; }
-        public decimal TotalCostInDollars => Parcels.Sum(p => p.ShippingCostInDollars);
+        
+        public decimal SpeedyShippingCostInDollars { get; internal set; }
+
+        public decimal TotalCostInDollars =>
+            Parcels.Sum(p => p.ShippingCostInDollars) +
+            SpeedyShippingCostInDollars;
     }
 }
