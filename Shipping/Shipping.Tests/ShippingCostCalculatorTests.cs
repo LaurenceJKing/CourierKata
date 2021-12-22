@@ -23,7 +23,7 @@ namespace Shipping.Tests
             {
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
 
-                shippingCostBreakdown.Parcels[0].Description.Should().Be(ParcelSize.Small.Description);
+                shippingCostBreakdown.Parcels[0].Description.Should().Be("Small");
             }
 
             [Theory]
@@ -72,7 +72,7 @@ namespace Shipping.Tests
             {
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
 
-                shippingCostBreakdown.Parcels[0].Description.Should().Be(ParcelSize.Medium.Description);
+                shippingCostBreakdown.Parcels[0].Description.Should().Be("Medium");
             }
 
             [Theory]
@@ -121,7 +121,7 @@ namespace Shipping.Tests
             {
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
 
-                shippingCostBreakdown.Parcels[0].Description.Should().Be(ParcelSize.Large.Description);
+                shippingCostBreakdown.Parcels[0].Description.Should().Be("Large");
             }
 
             [Theory]
@@ -166,16 +166,16 @@ namespace Shipping.Tests
 
             [Theory]
             [MemberData(nameof(ExamplesOfXLParcels))]
-            public void Large_parcels_have_dimentions_that_are_less_than_100cm(Parcel parcel)
+            public void XL_parcels_have_dimentions_that_are_less_than_100cm(Parcel parcel)
             {
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
 
-                shippingCostBreakdown.Parcels[0].Description.Should().Be(ParcelSize.XL.Description);
+                shippingCostBreakdown.Parcels[0].Description.Should().Be("XL");
             }
 
             [Theory]
             [MemberData(nameof(ExamplesOfXLParcels))]
-            public void Large_parcels_cost_15_dollars_to_ship(Parcel parcel)
+            public void XL_parcels_cost_15_dollars_to_ship(Parcel parcel)
             {
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
 
@@ -196,6 +196,54 @@ namespace Shipping.Tests
             [InlineData(11.01, 29.00)]
             [InlineData(17.00, 39.00)]
             public void XL_parcels_over_10kg_incur_an_extra_fee_of_2_dollars_per_kg(double weightInKg, decimal expectedCostInDollars)
+            {
+                var parcel = new Parcel { WidthInCm = 1, BredthInCm = 1, HeightInCm = 100, WeightInKg = weightInKg };
+                var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
+
+                shippingCostBreakdown.Parcels[0].ShippingCostInDollars.Should().Be(expectedCostInDollars);
+            }
+        }
+
+        public class HeavyParcels : ShippingCostCalculatorTests
+        {
+            public static TheoryData<Parcel> ExamplesOfHeavyParcels =>
+            new()
+            {
+                { new Parcel() { WidthInCm = 1.0, BredthInCm = 1.0, HeightInCm = 1.0, WeightInKg = 50.00 } }
+            };
+
+            [Theory]
+            [MemberData(nameof(ExamplesOfHeavyParcels))]
+            public void Heavy_parcels_can_be_any_size(Parcel parcel)
+            {
+                var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
+
+                shippingCostBreakdown.Parcels[0].Description.Should().Be("Heavy");
+            }
+
+            [Theory]
+            [MemberData(nameof(ExamplesOfHeavyParcels))]
+            public void Heavy_parcels_cost_15_dollars_to_ship(Parcel parcel)
+            {
+                var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
+
+                shippingCostBreakdown.Parcels[0].ShippingCostInDollars.Should().Be(50.00m);
+            }
+
+            [Theory]
+            [MemberData(nameof(ExamplesOfHeavyParcels))]
+            public void Heavy_parcels_under_50kg_do_not_incur_an_extra_fee(Parcel parcel)
+            {
+                var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
+
+                shippingCostBreakdown.Parcels[0].ShippingCostInDollars.Should().Be(50.00m);
+            }
+
+            [Theory]
+            [InlineData(50.01, 51.00)]
+            [InlineData(51.01, 52.00)]
+            [InlineData(67.00, 67.00)]
+            public void Heavy_parcels_over_50kg_incur_an_extra_fee_of_1_dollars_per_kg(double weightInKg, decimal expectedCostInDollars)
             {
                 var parcel = new Parcel { WidthInCm = 1, BredthInCm = 1, HeightInCm = 100, WeightInKg = weightInKg };
                 var shippingCostBreakdown = SUT.CalculateShippingCosts(new[] { parcel });
@@ -247,9 +295,6 @@ namespace Shipping.Tests
                 shippingCostBreakdown.SpeedyShippingCostInDollars.Should().Be(51.00m);
                 shippingCostBreakdown.TotalCostInDollars.Should().Be(102.00m);
             }
-
         }
     }
-
-
 }

@@ -4,7 +4,7 @@ namespace Shipping
 {
     public class ShippingCostBreakdown
     {
-        public ShippingCostItem[] Parcels { get; internal init; }
+        public ShippingCostItem[] Parcels { get; internal init; } = Array.Empty<ShippingCostItem>();
         
         public decimal SpeedyShippingCostInDollars { get; internal set; }
 
@@ -15,8 +15,7 @@ namespace Shipping
 
     public class ShippingCostItem
     {
-        internal ParcelSize ParcelSize { get; init; }
-        public string Description => ParcelSize.Description;
+        public string Description { get; init; } = string.Empty;
         public decimal ShippingCostInDollars { get; internal init; }
     }
 }

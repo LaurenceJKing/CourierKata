@@ -8,7 +8,7 @@
         {
             var shippingCosts = new ShippingCostBreakdown()
             {
-                Parcels = parcels.Select(parcel => ParcelSize.CalculateForParcel(parcel)).ToArray()
+                Parcels = parcels.Select(parcel => ParcelType.CalculateShippingCost(parcel)).ToArray()
             };
 
             return SpeedyShipping.Calculate(shippingCosts);
